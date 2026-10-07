@@ -1,6 +1,6 @@
 {
   "name": "usageboard",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Model, context %, 5h/7d plan limits with weather emoji, and today's local token usage & cost, drawn above the prompt",
   "author": { "name": "illustra9527", "url": "https://github.com/illustra9527" },
   "homepage": "https://github.com/illustra9527/claude-usage-statusline",

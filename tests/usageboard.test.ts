@@ -95,3 +95,36 @@ test('limits show a dash off a subscription', async ($, on) => {
   expect(await ui.find({ text: /today —/ })).toBeDefined()
   await ui.unmount()
 })
+
+test('figures are read again after /resume or /clear', async ($, on) => {
+  const clock = mock.clock(on)
+  // /resume resets $.state and doesn't fire session.start again, so the mod has to
+  // read the figures again on classic.SessionStart. Before it, the stubs report nothing.
+  let resumed = false
+  on('session.start', () => ({ cwd: '/work' }))
+  on('classic.SessionStart', () => ({}))
+  on('session.usage', () => ({
+    value: resumed
+      ? { startedAt: 0, context: { window: 1_000_000, tokens: 420_000, percent: 42 }, rateLimits: [{ kind: 'five_hour', percentUsed: 30 }] }
+      : { startedAt: 0, context: { window: 1_000_000 }, rateLimits: [] },
+  }))
+  on('session.model', () => ({ value: 'claude-opus-5-5' }))
+  on('process.run', () => ({
+    value: resumed
+      ? { exitCode: 0, stdout: '{"tokens":1000,"cost":0.5}', stderr: '', isStdoutTruncated: false, isStderrTruncated: false }
+      : { exitCode: 1, stdout: '', stderr: '', isStdoutTruncated: false, isStderrTruncated: false },
+  }))
+  on('ui.render', () => ({ type: 'Text', props: {}, children: [''] }))
+
+  await $.session.start({ surface: 'terminal', isInteractive: true, cwd: '/work' })
+  await clock.advance(0)
+  resumed = true
+  await $.classic.SessionStart({ source: 'resume' })
+  await clock.advance(0)
+
+  const ui = await $.ui.mount({ ...BAND, surface: 'terminal' })
+  expect(await ui.find({ text: /Opus 5\.5 │ ctx ██░░░ 42%/ })).toBeDefined()
+  expect(await ui.find({ text: '5h ██░░░ 30% ☀️' })).toBeDefined()
+  expect(await ui.find({ text: /today 1\.0K \$0\.50/ })).toBeDefined()
+  await ui.unmount()
+})

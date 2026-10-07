@@ -43,6 +43,13 @@ export const register: Register = on => {
     return next(e)
   })
 
+  // /clear, /resume and /branch reset $.state without firing session.start again.
+  on('classic.SessionStart', { source: ['clear', 'resume', 'fork'] }, async ($, e, next) => {
+    await measure($)
+    refreshToday($).catch(() => {})
+    return next(e)
+  })
+
   on('session.measure', async ($, e, next) => {
     await measure($)
     return next(e)
