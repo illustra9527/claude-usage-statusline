@@ -1,0 +1,16 @@
+{
+  "name": "claude-usage-statusline",
+  "owner": {
+    "name": "illustra9527"
+  },
+  "plugins": [
+    {
+      "name": "usageboard",
+      "source": "./",
+      "description": "Model, context %, 5h/7d plan limits with weather emoji, and today's local token usage & cost, drawn above the prompt"
+    }
+  ],
+  "metadata": {
+    "description": "Claude Code usage at a glance: plan limits, context and today's token spend"
+  }
+}

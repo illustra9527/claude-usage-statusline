@@ -192,6 +192,13 @@ function render(input) {
   return parts.join(SEP);
 }
 
+// `--today`: print today's totals as JSON (used by the mod version).
+if (process.argv.includes('--today')) {
+  const t = todayUsage();
+  process.stdout.write(JSON.stringify({ tokens: t.tokens, cost: t.cost }));
+  return;
+}
+
 let raw = '';
 process.stdin.setEncoding('utf8');
 process.stdin.on('data', (d) => (raw += d));

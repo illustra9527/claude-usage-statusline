@@ -2,18 +2,18 @@
 
 [繁體中文](README.zh-TW.md)
 
-A zero-dependency [Claude Code](https://code.claude.com) status line that shows your plan usage and today's local token spend at a glance.
+See your [Claude Code](https://code.claude.com) plan usage and today's local token spend at a glance. Use it as a **mod** (drawn above the prompt) or as a classic **status line** script (drawn below it).
 
 ```
 Opus 5.5 │ ctx ██░░░ 42% ☀️ │ 5h █░░░░ 23% ☀️ │ 7d ███░░ 61% ☁️ │ today 1.2M $3.45
 ```
 
-| Segment | Meaning | Source |
-|---|---|---|
-| `Opus 5.5` | Current model | statusline stdin |
-| `ctx` | Context window used | statusline stdin |
-| `5h` / `7d` | 5-hour / weekly plan rate limit used | statusline stdin (`rate_limits`) |
-| `today` | Tokens and estimated cost since local midnight, across all sessions | `~/.claude/projects/**/*.jsonl` |
+| Segment | Meaning |
+|---|---|
+| `Opus 5.5` | Current model |
+| `ctx` | Context window used |
+| `5h` / `7d` | 5-hour / weekly plan rate limit used |
+| `today` | Tokens and estimated cost since local midnight, across all sessions |
 
 The weather emoji reflects how heavily each limit is used:
 
@@ -24,13 +24,36 @@ The weather emoji reflects how heavily each limit is used:
 | 75–89% | 🌧️ |
 | 90–100% | ⛈️ |
 
+## Mod or status line?
+
+Both show the same line. Pick one, not both.
+
+| | Mod | Status line |
+|---|---|---|
+| How it works | Code that runs inside Claude Code and reacts to its events | A script Claude Code runs on each update, printing one line of text |
+| Where it shows | Above the prompt | Below the prompt |
+| Reset countdown | Hover `5h` / `7d` to see when the limit resets | — |
+| Install | `/plugin install` | Edit `settings.json` |
+| Claude Code version | 2.1.287 or later | Any version with status line support |
+
 ## Requirements
 
-- Claude Code with status line support
-- Node.js 18+
-- `5h` / `7d` are only available to Claude.ai Pro / Max subscribers, and appear after the first response in a session. Otherwise they show `—`.
+- Node.js 18+ (both versions use `statusline.js` to read today's usage)
+- `5h` / `7d` are only available to Claude.ai Pro / Max subscribers, and appear after the first response in a session. Otherwise they show `—`. `ctx` also shows `—` until the first response.
 
-## Install
+## Install as a mod
+
+Inside Claude Code:
+
+```
+/plugin marketplace add illustra9527/claude-usage-statusline
+/plugin install usageboard@claude-usage-statusline
+/reload-plugins
+```
+
+Run `/plugin` to check that `usageboard` is listed as an active mod. To turn it off, disable it in `/plugin`.
+
+## Install as a status line
 
 ```sh
 git clone https://github.com/illustra9527/claude-usage-statusline.git ~/.claude/claude-usage-statusline
@@ -60,15 +83,24 @@ echo '{"model":{"display_name":"Opus 5.5"},"context_window":{"used_percentage":4
 - Tokens = input + output + cache write + cache read.
 - Cost uses `pricing.json` (Anthropic API list prices). On a subscription plan this is the API-equivalent value, not what you are billed.
 - Only newly appended bytes are read on each refresh; progress is cached in your OS temp directory and resets daily.
+- The mod runs `node statusline.js --today` after each turn and once a minute, since a mod can't read files over 4 MiB.
 
 ## Customize
 
-- Thresholds, emoji, bar width and separator: constants at the top of `statusline.js`.
+- Thresholds, emoji, bar width and separator: constants at the top of `statusline.js` (status line) and `hooks/format.ts` (mod).
 - Prices: edit `pricing.json`. Model IDs are matched by longest prefix; unknown models count tokens but cost $0.
+
+## Development
+
+```sh
+claude --plugin-dir .        # load the mod for one session; edits reload on save
+claude plugin validate .claude-plugin/plugin.json
+claude plugin test .
+```
 
 ## Privacy
 
-Everything runs locally. The script makes no network requests and does not read credentials.
+Everything runs locally. Neither version makes network requests or reads credentials.
 
 ## License
 
