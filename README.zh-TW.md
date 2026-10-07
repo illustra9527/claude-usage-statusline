@@ -33,7 +33,7 @@ Opus 5.5 │ ctx ██░░░ 42% ☀️ │ 5h █░░░░ 23% ☀️ �
 ## 安裝
 
 ```sh
-git clone https://github.com/<you>/claude-usage-statusline.git ~/.claude/claude-usage-statusline
+git clone https://github.com/illustra9527/claude-usage-statusline.git ~/.claude/claude-usage-statusline
 ```
 
 在 `~/.claude/settings.json` 加入：

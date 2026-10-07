@@ -33,7 +33,7 @@ The weather emoji reflects how heavily each limit is used:
 ## Install
 
 ```sh
-git clone https://github.com/<you>/claude-usage-statusline.git ~/.claude/claude-usage-statusline
+git clone https://github.com/illustra9527/claude-usage-statusline.git ~/.claude/claude-usage-statusline
 ```
 
 Add to `~/.claude/settings.json`:
